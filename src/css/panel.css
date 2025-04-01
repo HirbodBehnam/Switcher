@@ -82,7 +82,7 @@ hr {
   border-radius: 2px;
 }
 
-.button-list li:not(:last-child):hover{
+.button-list li:hover{
   background: #0b0a0a17;
   cursor: pointer;
 }
@@ -146,6 +146,16 @@ hr {
   background-repeat: no-repeat;
   margin: 0px 10px 0px 0px;
   float: left;
+}
+
+.add-manual {
+  width: 16px;
+  height: 16px;
+  background-image: url("../images/icons/add.png");
+  background-repeat: no-repeat;
+  margin: 0px 10px 0px 0px;
+  float: left;
+  background-position-y: -1px;
 }
 
 .bottom {
