@@ -13,7 +13,15 @@ function gotProxyType(popupURL) {
     browser.proxy.settings.get({}),
     browser.storage.local.get("proxies"),
   ]).then(results => {
-    setupSwitcher(results[0].value.proxyType, results[1].proxies ?? []);
+    let proxyAddress = "";
+    if (results[0].value.proxyType == "manual") {
+      if (results[0].value.http != "") {
+        proxyAddress = "http://" + results[0].value.http;
+      } else if (results[0].value.socks != "") {
+        proxyAddress = "socks5://" + results[0].value.socks;
+      }
+    }
+    setupSwitcher(results[0].value.proxyType, proxyAddress, results[1].proxies ?? []);
   });
 }
 

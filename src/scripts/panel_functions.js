@@ -1,3 +1,4 @@
+let manualProxies = [];
 
 //Fire when user clicked on noproxy button
 function setNoProxySetting() {
@@ -17,21 +18,13 @@ function setNoProxySetting() {
   let noProxySetIcon = document.getElementsByClassName("Switcher-icon-status");
   noProxySetIcon[0].src = "../images/icons/set_noproxy.png";
 
-  let noproxyText = document.getElementsByClassName("noproxy-text");
-  noproxyText[0].innerText = "No Proxy Mode Is Set";
-
-  let systemproxyText = document.getElementsByClassName("systemproxy-text");
-  systemproxyText[0].innerText = "Switch To System Proxy";
-
   let systemproxy = document.getElementById("systemproxy-id");
   systemproxy.classList.remove("active");
 
-  //panel shortcut handeling
-  let systemproxyShortcut = document.getElementById("systemproxy-shortcut");
-  systemproxyShortcut.classList.add("shortcut-active");
-
-  let noproxyShortcut = document.getElementById("noproxy-shortcut");
-  noproxyShortcut.classList.remove("shortcut-active");
+  for (let i = 0; i < manualProxies.length; i++) {
+    let customProxy = document.getElementById("manual-proxy-" + i);
+    customProxy.classList.remove("active");
+  }
 }
 
 //Fire when user clicked on systemproxy button
@@ -52,21 +45,13 @@ function setSystemProxySetting() {
   let systemProxySetIcon = document.getElementsByClassName("Switcher-icon-status");
   systemProxySetIcon[0].src = "../images/icons/set_systemproxy.png";
 
-  let noproxyText = document.getElementsByClassName("noproxy-text");
-  noproxyText[0].innerText = "Switch To No Proxy";
-
-  let systemproxyText = document.getElementsByClassName("systemproxy-text");
-  systemproxyText[0].innerText = "System Proxy Is Set ";
-
   let noproxy = document.getElementById("noproxy-id");
   noproxy.classList.remove("active");
 
-  //panel shortcut handeling
-  let systemproxyShortcut = document.getElementById("systemproxy-shortcut");
-  systemproxyShortcut.classList.remove("shortcut-active");
-
-  let noproxyShortcut = document.getElementById("noproxy-shortcut");
-  noproxyShortcut.classList.add("shortcut-active");
+  for (let i = 0; i < manualProxies.length; i++) {
+    let customProxy = document.getElementById("manual-proxy-" + i);
+    customProxy.classList.remove("active");
+  }
 }
 
 function createFragment(htmlStr) {
@@ -78,8 +63,6 @@ function createFragment(htmlStr) {
   }
   return frag;
 }
-
-let manualProxyIndex = 0;
 
 function addManualProxy() {
   // Read the proxy info
@@ -96,12 +79,12 @@ function addManualProxy() {
 
   // Add it to the form
   let proxyList = document.getElementById("proxy-list");
-  const item = createFragment('<li id="manual-proxy-' + manualProxyIndex + '"><i class="manual"></i><span> ' + proxy + '</span></li>');
+  const item = createFragment('<li id="manual-proxy-' + manualProxies.length + '"><i class="manual"></i><span> ' + proxy + '</span></li>');
   proxyList.insertBefore(item, proxyList.childNodes[proxyList.childNodes.length - 2]);
-  let proxyElement = document.getElementById("manual-proxy-" + manualProxyIndex);
+  let proxyElement = document.getElementById("manual-proxy-" + manualProxies.length);
   proxyElement.addEventListener("click", setManualProxySetting);
   proxyElement.proxy = proxy;
-  manualProxyIndex++;
+  manualProxies.push(proxy);
 
   // Add it storage
   browser.storage.local.get("proxies").then(proxies => {
@@ -128,13 +111,35 @@ function setManualProxySetting(event) {
     manualProxySetting.proxyDNS = true;
   }
 
+  console.log(manualProxySetting);
   browser.proxy.settings.set({ value: manualProxySetting });
+
+  // Find the proxy index and set it active
+  for (let i = 0; i < manualProxies.length; i++) {
+    if (manualProxies[i] == proxy) {
+      let systemproxy = document.getElementById("manual-proxy-" + i);
+      systemproxy.classList.add("active");
+      break;
+    }
+  }
+
+  let noproxy = document.getElementById("noproxy-id");
+  noproxy.classList.remove("active");
+
+  let systemproxy = document.getElementById("systemproxy-id");
+  systemproxy.classList.remove("active");
+
+  // call setBadgeText function from browser_action.js
+  setBadgeText("M");
+
+  let systemProxySetIcon = document.getElementsByClassName("Switcher-icon-status");
+  systemProxySetIcon[0].src = "../images/icons/set_systemproxy.png";
 }
 
 
 
 //Fire 3th and checked current proxy type and update popup button list current proxy used
-function setupSwitcher(proxyType, savedProxies) {
+function setupSwitcher(proxyType, proxyAddress, savedProxies) {
 
   //Setup switcher version
   let version = browser.runtime.getManifest().version;
@@ -142,12 +147,12 @@ function setupSwitcher(proxyType, savedProxies) {
 
   savedProxies.forEach(proxy => {
     let proxyList = document.getElementById("proxy-list");
-    let item = createFragment('<li id="manual-proxy-' + manualProxyIndex + '"><i class="manual"></i><span> ' + proxy + '</span></li>');
+    let item = createFragment('<li id="manual-proxy-' + manualProxies.length + '"><i class="manual"></i><span> ' + proxy + '</span></li>');
     proxyList.insertBefore(item, proxyList.childNodes[proxyList.childNodes.length - 2]);
-    let proxyElement = document.getElementById("manual-proxy-" + manualProxyIndex);
+    let proxyElement = document.getElementById("manual-proxy-" + manualProxies.length);
     proxyElement.addEventListener("click", setManualProxySetting);
     proxyElement.proxy = proxy;
-    manualProxyIndex++;
+    manualProxies.push(proxy);
   });
 
   //Setup swithcer for current proxy mode
@@ -155,50 +160,37 @@ function setupSwitcher(proxyType, savedProxies) {
     let noproxy = document.getElementById("noproxy-id");
     noproxy.classList.add("active");
 
-    let noproxyText = document.getElementsByClassName("noproxy-text");
-    noproxyText[0].innerText = "No Proxy Mode Is Set";
-
     // call setBadgeText function from browserAction.js
     setBadgeText("N");
 
     let noProxySetIcon = document.getElementsByClassName("Switcher-icon-status");
     noProxySetIcon[0].src = "../images/icons/set_noproxy.png";
-
-    let systemproxyText = document.getElementsByClassName("systemproxy-text");
-    systemproxyText[0].innerText = "Switch To System Proxy";
-
-    let systemproxyShortcut = document.getElementById("systemproxy-shortcut");
-    systemproxyShortcut.classList.add("shortcut-active");
-
-    let noproxyShortcut = document.getElementById("noproxy-shortcut");
-    noproxyShortcut.classList.remove("shortcut-active");
   }
   else if (proxyType == "system") {
     let systemproxy = document.getElementById("systemproxy-id");
     systemproxy.classList.add("active");
-
-    let noproxyText = document.getElementsByClassName("noproxy-text");
-    noproxyText[0].innerText = "Switch To No Proxy";
 
     // call setBadgeText function from browserAction.js
     setBadgeText("S");
 
     let systemProxySetIcon = document.getElementsByClassName("Switcher-icon-status");
     systemProxySetIcon[0].src = "../images/icons/set_systemproxy.png";
-
-    let systemproxyText = document.getElementsByClassName("systemproxy-text");
-    systemproxyText[0].innerText = "System Proxy Is Set";
-
-    let systemproxyShortcut = document.getElementById("systemproxy-shortcut");
-    systemproxyShortcut.classList.remove("shortcut-active");
-
-    let noproxyShortcut = document.getElementById("noproxy-shortcut");
-    noproxyShortcut.classList.add("shortcut-active");
-
   }
   else if (proxyType == "manual") {
+    // Find the proxy index and set it active
+    for (let i = 0; i < manualProxies.length; i++) {
+      if (manualProxies[i] == proxyAddress) {
+        let systemproxy = document.getElementById("manual-proxy-" + i);
+        systemproxy.classList.add("active");
+        break;
+      }
+    }
+
     // call setBadgeText function from browser_action.js
     setBadgeText("M");
+
+    let systemProxySetIcon = document.getElementsByClassName("Switcher-icon-status");
+    systemProxySetIcon[0].src = "../images/icons/set_systemproxy.png";
   }
 
 }

@@ -11,14 +11,6 @@
   "icons": {
     "32": "src/images/icons/tunnel_c_32x32.png"
   },
-  "commands": {
-    "switch": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+S"
-      },
-      "description": "Switch between system proxy and no proxy mode"
-    }
-  },
   "permissions": [
     "proxy",
     "storage"
