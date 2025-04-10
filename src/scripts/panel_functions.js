@@ -3,7 +3,7 @@ let manualProxies = [];
 //Fire when user clicked on noproxy button
 function setNoProxySetting() {
 
-  let noProxySetting = {
+  const noProxySetting = {
     proxyType: "none",
   };
 
@@ -30,7 +30,7 @@ function setNoProxySetting() {
 //Fire when user clicked on systemproxy button
 function setSystemProxySetting() {
 
-  let systemProxySetting = {
+  const systemProxySetting = {
     proxyType: "system",
   };
 
@@ -66,14 +66,14 @@ function createFragment(htmlStr) {
 
 function addManualProxy() {
   // Read the proxy info
-  let proxy = prompt("Please type your proxy address with the schema (for example: socks5://127.0.0.1:1080)");
+  let proxy = prompt("Please type your proxy address with the schema (for example: http://127.0.0.1:1080)");
   if (proxy == null)
     return;
   proxy = proxy.trim();
 
   // Validate it
-  if (!proxy.startsWith("http://") && !proxy.startsWith("socks5://")) {
-    alert("Invalid proxy schema: Must be http or socks5");
+  if (!proxy.startsWith("http://")) {
+    alert("Invalid proxy schema: Must be http");
     return;
   }
 
@@ -100,18 +100,12 @@ function setManualProxySetting(event) {
   const proxy = event.currentTarget.proxy;
 
   // completed in next version 
-  let manualProxySetting = {
+  const manualProxySetting = {
     proxyType: "manual",
+    http: proxy,
+    httpProxyAll: true,
   };
-  if (proxy.startsWith("http://")) {
-    manualProxySetting.http = proxy;
-    manualProxySetting.httpProxyAll = true;
-  } else if (proxy.startsWith("socks5://")) {
-    manualProxySetting.socks = proxy;
-    manualProxySetting.proxyDNS = true;
-  }
 
-  console.log(manualProxySetting);
   browser.proxy.settings.set({ value: manualProxySetting });
 
   // Find the proxy index and set it active
