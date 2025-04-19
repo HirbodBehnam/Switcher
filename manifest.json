@@ -32,5 +32,10 @@
       "src/scripts/background_events.js",
       "src/scripts/panel_functions.js"
     ]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "chrome.hiri.angry@gmail.com"
+    }
   }
 }
