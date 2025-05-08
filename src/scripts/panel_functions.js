@@ -110,11 +110,11 @@ function setManualProxySetting(event) {
 
   // Find the proxy index and set it active
   for (let i = 0; i < manualProxies.length; i++) {
-    if (manualProxies[i] == proxy) {
-      let systemproxy = document.getElementById("manual-proxy-" + i);
-      systemproxy.classList.add("active");
-      break;
-    }
+    let manualProxy = document.getElementById("manual-proxy-" + i);
+    if (manualProxies[i] == proxy)
+      manualProxy.classList.add("active");
+    else
+      manualProxy.classList.remove("active");
   }
 
   let noproxy = document.getElementById("noproxy-id");
